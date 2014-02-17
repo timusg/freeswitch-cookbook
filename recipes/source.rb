@@ -1,4 +1,9 @@
-include_recipe 'apt'
+case node['platform']
+when 'ubuntu', 'debian'
+  include_recipe 'apt'
+when 'redhat', 'centos', 'fedora'
+  include_recipe 'yum'
+end
 
 node['freeswitch']['source']['dependencies'].each { |d| package d }
 
@@ -35,7 +40,7 @@ script "compile_freeswitch" do
   make
   #{"make config-#{node['freeswitch']['source']['config_template']}" if node['freeswitch']['source']['config_template']}
   make install
-EOF
+  EOF
   not_if "test -f #{node['freeswitch']['binpath']}/freeswitch"
 end
 
